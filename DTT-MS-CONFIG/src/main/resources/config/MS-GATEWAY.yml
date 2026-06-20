@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: MS-GATEWAY
+springdoc:
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    urls:
+      - name: Auth Service
+        url: /auth/v3/api-docs
+      - name: Order Service
+        url: /order/v3/api-docs
+      - name: Catalog Service
+        url: /catalog/v3/api-docs
+    persist-authorization: true

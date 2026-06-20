@@ -1,0 +1,11 @@
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:9095/.well-known/jwks.json
+api:
+  auth: ${URL_API_AUTH:http://localhost:9095}
+  order: ${URL_API_ORDER:http://localhost:8060}
+  catalog: ${URL_API_CATALOG:http://localhost:8050}
+url_front: ${URL_FRONT:http://localhost:8080}

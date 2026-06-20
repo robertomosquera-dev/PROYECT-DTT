@@ -1,0 +1,4 @@
+networks:
+  dtt-network:
+    name: dtt-network
+    driver: bridge

@@ -1,0 +1,16 @@
+services:
+  auth-public:
+    container_name: dtt-auth-public
+    build:
+      context: ../../../MS-AUTH-PUBLIC
+    env_file:
+      - ../../.env
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "${AUTH_PORT}:${AUTH_PORT}"
+    volumes:
+      - ../../keys/auth:/keys:ro
+    networks:
+      - dtt-network
+    restart: unless-stopped

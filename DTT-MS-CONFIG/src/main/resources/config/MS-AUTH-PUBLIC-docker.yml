@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: MS-AUTH-PUBLIC
+
+  datasource:
+    url: jdbc:postgresql://${DB_AUTH_URL}:5432/${DB_AUTH_DATABASE}
+    username: ${DB_AUTH_USER}
+    password: ${DB_AUTH_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    generate-ddl: true
+
+jwt:
+  private-key: file:/keys/private.key
+  public-key: file:/keys/public.key
+  expiration-time: ${EXPIRATION_TIME}
+  issuer: ms-auth
+  refresh-expiration-time: ${REFRESH_EXPIRATION_TIME}
+
+server:
+  port: ${AUTH_PORT}

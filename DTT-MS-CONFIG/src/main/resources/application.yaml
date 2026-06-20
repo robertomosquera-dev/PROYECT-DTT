@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: MS-CONFIG
+
+  profiles:
+    active: native
+    group:
+      docker: native,docker
+
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: classpath:/config
+
+server:
+  port: ${CONFIG_PORT:8888}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: always

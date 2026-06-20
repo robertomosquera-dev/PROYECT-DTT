@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: DTT-MS-CATALOG
+  jpa:
+    hibernate:
+      ddl-auto: none
+    generate-ddl: true
+    show-sql: true
+
+  servlet:
+    multipart:
+      max-request-size: 5MB
+      max-file-size: 5MB
+server:
+  port: 8050

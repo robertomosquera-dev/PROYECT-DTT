@@ -1,0 +1,22 @@
+services:
+
+  catalog:
+
+    container_name: dtt-catalog
+
+    build:
+      context: ../../../DTT-MS-CATALOG-V2
+
+    env_file:
+      - ../../.env
+
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+
+    ports:
+      - "${CATALOG_PORT}:${CATALOG_PORT}"
+
+    networks:
+      - dtt-network
+
+    restart: unless-stopped

@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: MS-MERCADO-PAGO
+server:
+  port: 7080

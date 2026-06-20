@@ -1,0 +1,13 @@
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://${MS_AUTH}:${AUTH_PORT}/.well-known/jwks.json
+api:
+  auth: ${URL_API_AUTH}
+  order: ${URL_API_ORDER}
+  catalog: ${URL_API_CATALOG}
+url_front: ${URL_FRONT}
+server:
+  port: ${GATEWAY_PORT}

@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    username: root
+    password: 1134
+    url: jdbc:postgresql://localhost:5432/dtt-order
+api:
+  logic: http://localhost:8050/
+  mp: http://localhost:7080/
+  auth: http://localhost:9095/

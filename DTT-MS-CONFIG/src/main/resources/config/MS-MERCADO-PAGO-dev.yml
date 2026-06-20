@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: MS-MERCADO-PAGO
+mp-config:
+  url-mercado-pago: https://api.mercadopago.com
+  access-token: ${AccessToken}
+  public-key: ${PublicKey}
+back-urls:
+  success: ${UrlSuccess:http://localhost:8080/mercado-pago/success}
+  failure: ${UrlFailure:http://localhost:8080/mercado-pago/failure}
+  pending: ${UrlPending:http://localhost:8080/mercado-pago/pending}
+api:
+  order: http://localhost:8060/
+auth:
+  url: http://localhost:9095
+  service-name: ms-mercado-pago
+  api-key: ${AuthApiKey:9ebb9c10-137b-4d4a-b689-f8844c2e58b3}
+
+url:
+  notification: https://keesha-velutinous-sufficiently.ngrok-free.dev/webhook-test

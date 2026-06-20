@@ -1,0 +1,26 @@
+services:
+  config:
+    container_name: dtt-config
+    build:
+      context: ../../../DTT-MS-CONFIG
+    env_file:
+      - ../../.env
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "${CONFIG_PORT}:${CONFIG_PORT}"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "curl",
+          "-f",
+          "http://localhost:${CONFIG_PORT}/actuator/health"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - dtt-network
+    restart: unless-stopped

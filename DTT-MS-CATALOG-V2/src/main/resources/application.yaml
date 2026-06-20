@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: DTT-MS-CATALOG
+  config:
+    import: configserver:http://${MS_CONFIG:localhost}:${CONFIG_PORT:8888}/

@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: MS-MERCADO-PAGO
+mp-config:
+  url-mercado-pago: ${URL_MERCADO_PAGO}
+  access-token: ${ACCESS_TOKEN}
+  public-key: ${PUBLIC_KEY}
+back-urls:
+  success: ${URL_SUCCESS}
+  failure: ${URL_FAILURE}
+  pending: ${URL_PENDING}
+api:
+  order: ${URL_API_ORDER}
+auth:
+  url: ${URL_API_AUTH}
+  service-name: ${SERVICE_NAME_API}
+  api-key: ${AUTH_API_KEY}
+
+url:
+  notification: ${URL_NOTIFICATION_MP}

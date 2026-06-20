@@ -1,0 +1,52 @@
+include:
+  - ./networks/network.yml
+
+services:
+
+  config:
+    extends:
+      file: ./services/config/docker-compose.yml
+      service: config
+
+  auth-public:
+    extends:
+      file: ./services/auth-public/docker-compose.yml
+      service: auth-public
+    depends_on:
+      config:
+        condition: service_healthy
+
+  catalog:
+    extends:
+      file: ./services/catalog/docker-compose.yml
+      service: catalog
+    depends_on:
+      config:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      auth-public:
+        condition: service_started
+
+  gateway:
+    extends:
+      file: ./services/gateway/docker-compose.yml
+      service: gateway
+    depends_on:
+      auth-public:
+        condition: service_started
+      catalog:
+        condition: service_started
+
+  redis:
+    extends:
+      file: ./services/redis/docker-compose.yml
+      service: redis
+
+networks:
+  dtt-network:
+    name: dtt-network
+    driver: bridge
+
+volumes:
+  redis-data:

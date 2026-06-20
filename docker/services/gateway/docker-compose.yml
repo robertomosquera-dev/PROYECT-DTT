@@ -1,0 +1,14 @@
+services:
+  gateway:
+    container_name: dtt-gateway
+    build:
+      context: ../../../DTT-MS-GATEWAY
+    env_file:
+      - ../../.env
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "${GATEWAY_PORT}:${GATEWAY_PORT}"
+    networks:
+      - dtt-network
+    restart: unless-stopped

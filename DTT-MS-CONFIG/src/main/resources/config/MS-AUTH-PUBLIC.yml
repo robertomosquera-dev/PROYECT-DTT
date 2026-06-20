@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: MS-AUTH-PUBLIC
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ms-auth
+    username: root
+    password: 1134
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    generate-ddl: true
+jwt:
+  private-key: classpath:certi/private.key
+  public-key: classpath:certi/public.key
+  expiration-time: 15
+  issuer: ms-auth
+  refresh-expiration-time: 30
+server:
+  port: 9095
+
+
+springdoc:
+  api-docs:
+    enabled: true
+
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+    display-request-duration: true
