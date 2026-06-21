@@ -23,7 +23,6 @@ import java.util.Map;
         name = "Service Authentication",
         description = "Endpoints for internal microservice authentication"
 )
-@Hidden
 public class AuthSystemController {
 
     private final ApiServiceService apiServiceService;

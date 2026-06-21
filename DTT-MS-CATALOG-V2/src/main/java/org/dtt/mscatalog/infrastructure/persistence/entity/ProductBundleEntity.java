@@ -9,6 +9,7 @@ import org.dtt.mscatalog.domain.model.Enum.ProductStatus;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -45,7 +46,7 @@ public class ProductBundleEntity extends EntityBase {
     private Set<CategoryEntity> categories = new HashSet<>();
 
     @OneToMany(mappedBy = "bundle", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<BundleItemEntity> items;
+    private List<BundleItemEntity> items = new ArrayList<>();
 
     @Column(nullable = false)
     private Integer stock;

@@ -94,7 +94,6 @@ public class GatewayConfig {
                         .path("/orders/**")
                         .uri(msOrder)
                 )
-
                 .route("ms-catalog", r -> r
                         .path(
                                 "/products",
@@ -110,7 +109,16 @@ public class GatewayConfig {
                                 "/base-products/**",
 
                                 "/reservations",
-                                "/reservations/**"
+                                "/reservations/**",
+
+                                "/admin/sale-products",
+                                "/admin/sale-products/**",
+
+                                "/admin/rental-products",
+                                "/admin/rental-products/**",
+
+                                "/admin/bundles",
+                                "/admin/bundles/**"
                         )
                         .uri(msCatalog)
                 )

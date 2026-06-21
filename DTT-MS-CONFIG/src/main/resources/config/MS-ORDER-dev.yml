@@ -2,7 +2,12 @@ spring:
   datasource:
     username: root
     password: 1134
-    url: jdbc:postgresql://localhost:5432/dtt-order
+    url: jdbc:postgresql://localhost:5432/order_db
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:9095/.well-known/jwks.json
 api:
   logic: http://localhost:8050/
   mp: http://localhost:7080/

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <property name="LOG_PATTERN"
+              value="%d{HH:mm:ss} %-5level %logger{36} - [%msg%n]"/>
+
+    <appender name="CONSOLE"
+                class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="org.dtt.msorder" level="INFO"/>
+    <logger name="org.dtt.msorder.client.WebClientMP" level="DEBUG"/>
+    <logger name="org.springframework" level="WARN"/>
+    <logger name="org.hibernate" level="ERROR" />
+
+    <root level="ERROR">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+</configuration>
