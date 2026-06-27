@@ -41,6 +41,17 @@ public class GlobalExceptionHandler {
                 ));
     }
 
+    @ExceptionHandler({
+            ReservationNotFoundException.class,
+            ReservationByOrderNotFoundException.class
+    })
+    public ResponseEntity<ConsumerResponse<Void>> handleReservationNotFound(
+            RuntimeException ex) {
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ConsumerResponse.error(404, ex.getMessage()));
+    }
+
     @ExceptionHandler(SlugAlreadyExistsException.class)
     public ResponseEntity<ConsumerResponse<Void>> handleSlugAlreadyExists(SlugAlreadyExistsException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
@@ -76,7 +87,8 @@ public class GlobalExceptionHandler {
             InvalidNameException.class,
             InvalidDescriptionException.class,
             InvalidPriceException.class,
-            InvalidRollsCountException.class
+            InvalidRollsCountException.class,
+            InvalidReservationStatusTransitionException.class,
     })
     public ResponseEntity<ConsumerResponse<Void>> handleDomainExceptions(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
