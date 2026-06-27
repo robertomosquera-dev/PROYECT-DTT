@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import org.dtt.mscatalog.domain.exception.InvalidReservationStatusTransitionException;
 import org.dtt.mscatalog.domain.model.Enum.StatusReservation;
 
 import java.time.LocalDateTime;
@@ -34,11 +35,13 @@ public class ReservationStock {
         return items.stream().map(ReservationItemStock::getProductId).toList();
     }
 
-    public void changeStatus(StatusReservation status){
-        if(this.estado.canTransitionTo(status)){
-            this.estado = status;
-        }else{
-            throw new IllegalStateException("Invalid status transition");
+    public void changeStatus(StatusReservation status) {
+        if (!this.estado.canTransitionTo(status)) {
+            throw new InvalidReservationStatusTransitionException(
+                    this.estado,
+                    status
+            );
         }
+        this.estado = status;
     }
 }
