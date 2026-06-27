@@ -7,4 +7,5 @@ import java.util.UUID;
 public interface ReservationStockRepositoryPort {
     ReservationStock save(ReservationStock reservationStock);
     Optional<ReservationStock> findById(UUID id);
+    Optional<ReservationStock> findByOrderId(UUID orderId);
 }

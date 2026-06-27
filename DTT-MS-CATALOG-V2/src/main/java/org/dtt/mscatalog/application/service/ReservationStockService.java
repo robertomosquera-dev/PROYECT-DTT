@@ -3,8 +3,10 @@ package org.dtt.mscatalog.application.service;
 import lombok.RequiredArgsConstructor;
 import org.dtt.mscatalog.application.dto.request.ReservationRequest;
 import org.dtt.mscatalog.application.dto.response.ItemCatalogResponse;
+import org.dtt.mscatalog.application.dto.response.ItemOrderResponse;
 import org.dtt.mscatalog.application.dto.response.ReservationResponse;
 import org.dtt.mscatalog.application.port.in.reservationStockUseCase.CreateReservationUseCase;
+import org.dtt.mscatalog.application.port.in.reservationStockUseCase.GetReservedProductsByOrderUseCase;
 import org.dtt.mscatalog.application.port.in.reservationStockUseCase.ProcessReservationUseCase;
 import org.dtt.mscatalog.application.port.out.ReservationStockRepositoryPort;
 import org.dtt.mscatalog.domain.model.Enum.StatusReservation;
@@ -32,7 +34,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @RequiredArgsConstructor
-public class ReservationStockService implements CreateReservationUseCase, ProcessReservationUseCase {
+public class ReservationStockService implements CreateReservationUseCase, ProcessReservationUseCase, GetReservedProductsByOrderUseCase {
 
     private final ReservationStockRepositoryPort reservationStockRepositoryPort;
     private final ReservationStockMapper reservationStockMapper;
@@ -165,5 +167,29 @@ public class ReservationStockService implements CreateReservationUseCase, Proces
         reservation.changeStatus(StatusReservation.CANCELED);
 
         reservationStockRepositoryPort.save(reservation);
+    }
+
+    @Override
+    public List<ItemOrderResponse> getReservedProducts(UUID orderId) {
+
+        ReservationStock reservationStock = reservationStockRepositoryPort
+                .findByOrderId(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Reservation not found by order id: " + orderId));
+
+        List<UUID> productIds = reservationStock.getItems().stream().map(ReservationItemStock::getProductId).toList();
+
+        List<ProductCatalogEntity> products = productCatalogService.listProductByIds(productIds);
+
+        return products
+                .stream()
+                .map(pc ->
+                        ItemOrderResponse
+                                .builder()
+                                .id(pc.getId())
+                                .name(pc.getName())
+                                .type(pc.getSkuType())
+                                .imageUrl(pc.getUrl())
+                                .build()
+                ).toList();
     }
 }

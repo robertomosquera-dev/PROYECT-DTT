@@ -46,4 +46,11 @@ public class JpaReservationStockRepositoryAdapter implements ReservationStockRep
         return springDataReservationStockRepository.findById(id)
                 .map(reservationStockMapper::toDomain);
     }
+
+    @Override
+    public Optional<ReservationStock> findByOrderId(UUID orderId) {
+        return springDataReservationStockRepository
+                .findByOrderId(orderId)
+                .map(reservationStockMapper::toDomain);
+    }
 }

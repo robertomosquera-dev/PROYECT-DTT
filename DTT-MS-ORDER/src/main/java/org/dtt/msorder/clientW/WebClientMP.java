@@ -1,4 +1,4 @@
-package org.dtt.msorder.client;
+package org.dtt.msorder.clientW;
 
 import org.dtt.msorder.dto.Request.PaymentOrderRequest;
 import org.dtt.msorder.dto.Response.PaymentResponse;

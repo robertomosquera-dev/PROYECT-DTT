@@ -1,4 +1,4 @@
-package org.dtt.msorder.client;
+package org.dtt.msorder.clientW;
 
 import lombok.RequiredArgsConstructor;
 import org.dtt.msorder.dto.Request.ReservationRequest;
