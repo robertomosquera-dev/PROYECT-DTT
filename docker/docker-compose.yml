@@ -38,6 +38,38 @@ services:
       catalog:
         condition: service_started
 
+  order:
+    extends:
+      file: ./services/order/docker-compose.yml
+      service: order
+    depends_on:
+      config:
+        condition: service_healthy
+      auth-public:
+        condition: service_started
+      catalog:
+        condition: service_started
+
+  mercado-pago:
+    extends:
+      file: ./services/mercado-pago/docker-compose.yml
+      service: mercado-pago
+    depends_on:
+      config:
+        condition: service_healthy
+      order:
+        condition: service_started
+      auth-public:
+        condition: service_started
+
+  ngrok:
+    extends:
+      file: ./services/ngrok/docker-compose.yml
+      service: ngrok
+    depends_on:
+      mercado-pago:
+        condition: service_started
+
   redis:
     extends:
       file: ./services/redis/docker-compose.yml

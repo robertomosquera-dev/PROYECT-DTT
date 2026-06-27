@@ -1,0 +1,16 @@
+services:
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: dtt-ngrok
+    restart: unless-stopped
+    environment:
+      NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN}
+    command:
+      - "http"
+      - "--url=https://${NGROK_DOMAIN}"
+      - "mercado-pago:${MERCADO_PAGO_PORT}"
+      - "--log=stdout"
+    networks:
+      - dtt-network
+    ports:
+      - "4040:4040"

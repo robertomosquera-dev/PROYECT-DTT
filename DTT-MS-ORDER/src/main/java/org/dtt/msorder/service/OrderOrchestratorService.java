@@ -18,13 +18,11 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
 @Service
 @RequiredArgsConstructor
 public class OrderOrchestratorService {
 
     private final SagaStepsService sagaStepsService;
-
     private final BuildPayerStep buildPayerStep;
     private final CreateOrderStep createOrderStep;
     private final CreationReservationStep creationReservationStep;
@@ -69,13 +67,11 @@ public class OrderOrchestratorService {
         validateTransition(order.getOrderStatus(), newStatus);
 
         switch (newStatus) {
-            case WAITING_PAYMENT -> waitingPaymentOrder(order);
             case COMPLETED -> acceptOrder(order);
             case CANCELLED -> cancelOrder(order);
         }
 
         order = orderService.updateOrder(order);
-
         return orderMapping.toDetailsResponse(order, getStockPerItem(order));
     }
 
@@ -101,11 +97,6 @@ public class OrderOrchestratorService {
         }
         order.setOrderStatus(OrderStatus.CANCELLED);
         order.setPaymentStatus(PaymentStatus.CANCELLED);
-    }
-
-    private void waitingPaymentOrder(PurchaseOrder order) {
-        order.setOrderStatus(OrderStatus.WAITING_PAYMENT);
-        order.setPaymentStatus(PaymentStatus.PENDING);
     }
 
     public OrderDTO findOrderById(UUID orderId) {

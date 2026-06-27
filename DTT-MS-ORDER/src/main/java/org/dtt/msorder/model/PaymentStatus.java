@@ -5,5 +5,4 @@ public enum PaymentStatus {
     APPROVED,    // pago exitoso
     REJECTED,    // pago fallido
     CANCELLED,   // pago cancelado
-    REFUNDED     // dinero devuelto
 }

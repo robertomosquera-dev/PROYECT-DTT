@@ -29,7 +29,7 @@ public interface CatalogClient {
             @RequestParam Boolean isConfirmed
     );
 
-    @GetMapping("/items/{orderId}")
+    @GetMapping("/reservation/items/{orderId}")
     ConsumerResponse<List<ItemOrderResponse>> getProductByOrderId(
             @PathVariable UUID orderId
     );

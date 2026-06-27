@@ -1,0 +1,14 @@
+services:
+  mercado-pago:
+    container_name: dtt-mercado-pago
+    build:
+      context: ../../../MS-MercadoPago-CAPI
+    env_file:
+      - ../../.env
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "${MERCADO_PAGO_PORT}:${MERCADO_PAGO_PORT}"
+    networks:
+      - dtt-network
+    restart: unless-stopped

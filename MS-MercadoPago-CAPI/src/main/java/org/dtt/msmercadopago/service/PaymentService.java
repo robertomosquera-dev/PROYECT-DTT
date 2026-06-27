@@ -152,7 +152,6 @@ public class PaymentService {
                 ))
                 .toList();
 
-        // ✅ ESTE ES EL QUE TE FALTABA
         BigDecimal totalAmount = order.getTotalAmount();
 
         log.info("Pagos encontrados: {}", payments);

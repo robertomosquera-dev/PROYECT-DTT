@@ -9,6 +9,5 @@ spring:
         jwt:
           jwk-set-uri: http://localhost:9095/.well-known/jwks.json
 api:
-  logic: http://localhost:8050/
-  mp: http://localhost:7080/
-  auth: http://localhost:9095/
+  catalog: http://localhost:8050
+  mp: http://localhost:7080

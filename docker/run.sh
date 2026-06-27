@@ -2,7 +2,7 @@
 set -uo pipefail
 cd "$(dirname "$0")"
 
-SERVICES=(redis config auth-public catalog gateway)
+SERVICES=(redis config auth-public catalog gateway order mercado-pago ngrok)
 MAX_WAIT=90
 INTERVAL=3
 

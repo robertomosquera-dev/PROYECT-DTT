@@ -6,12 +6,6 @@ public enum OrderStatus {
     PENDING {
         @Override
         public Set<OrderStatus> nextStates() {
-            return Set.of(WAITING_PAYMENT, CANCELLED, FAILED);
-        }
-    },
-    WAITING_PAYMENT {
-        @Override
-        public Set<OrderStatus> nextStates() {
             return Set.of(COMPLETED, CANCELLED, FAILED);
         }
     },

@@ -1,0 +1,14 @@
+services:
+  order:
+    container_name: dtt-order
+    build:
+      context: ../../../DTT-MS-ORDER
+    env_file:
+      - ../../.env
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "${ORDER_PORT}:${ORDER_PORT}"
+    networks:
+      - dtt-network
+    restart: unless-stopped
