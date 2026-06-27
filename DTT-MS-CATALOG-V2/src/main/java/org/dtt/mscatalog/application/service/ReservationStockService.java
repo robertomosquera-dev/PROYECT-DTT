@@ -5,6 +5,8 @@ import org.dtt.mscatalog.application.dto.request.ReservationRequest;
 import org.dtt.mscatalog.application.dto.response.ItemCatalogResponse;
 import org.dtt.mscatalog.application.dto.response.ItemOrderResponse;
 import org.dtt.mscatalog.application.dto.response.ReservationResponse;
+import org.dtt.mscatalog.application.exception.ReservationByOrderNotFoundException;
+import org.dtt.mscatalog.application.exception.ReservationNotFoundException;
 import org.dtt.mscatalog.application.port.in.reservationStockUseCase.CreateReservationUseCase;
 import org.dtt.mscatalog.application.port.in.reservationStockUseCase.GetReservedProductsByOrderUseCase;
 import org.dtt.mscatalog.application.port.in.reservationStockUseCase.ProcessReservationUseCase;
@@ -127,7 +129,7 @@ public class ReservationStockService implements CreateReservationUseCase, Proces
     public void processReservation(UUID reservationId, Boolean isConfirmed) {
         ReservationStock reservation = reservationStockRepositoryPort
                 .findById(reservationId)
-                .orElseThrow(() -> new IllegalArgumentException("Reservation not found: " + reservationId));
+                .orElseThrow(() -> new ReservationNotFoundException(reservationId));
         if (isConfirmed) {
             confirmReservation(reservation);
         } else {
@@ -174,7 +176,7 @@ public class ReservationStockService implements CreateReservationUseCase, Proces
 
         ReservationStock reservationStock = reservationStockRepositoryPort
                 .findByOrderId(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("Reservation not found by order id: " + orderId));
+                .orElseThrow(() -> new ReservationByOrderNotFoundException(orderId));
 
         List<UUID> productIds = reservationStock.getItems().stream().map(ReservationItemStock::getProductId).toList();
 
