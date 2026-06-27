@@ -1,15 +1,19 @@
 package org.dtt.msauthpublic.service;
 
+import com.nimbusds.jose.proc.SecurityContext;
 import lombok.RequiredArgsConstructor;
-import org.dtt.msauthpublic.dto.RegisterRequest;
-import org.dtt.msauthpublic.dto.RegisterResponse;
-import org.dtt.msauthpublic.dto.UserResponse;
+import org.dtt.msauthpublic.dto.*;
 import org.dtt.msauthpublic.model.*;
 import org.dtt.msauthpublic.repository.RoleRepository;
 import org.dtt.msauthpublic.repository.UserRepository;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -33,8 +37,72 @@ public class UserService {
                 .surname(user.getUserDetails().getSurname())
                 .phone(user.getUserDetails().getPhone())
                 .address(user.getUserDetails().getAddress())
+                .roles(user.getRoles().stream().map(Roles::getName).toList())
                 .build();
     }
+
+    public void deleteUser(UUID id){
+        User user = userRepository.findById(id).orElseThrow(()->new RuntimeException("User not found"));
+        user.setEnabled(false);
+        userRepository.save(user);
+    }
+
+    public List<UserResponse> FindAllUsers(Pageable pageable){
+        List<User> users = userRepository.findAllByRoles_NameInAndEnabledTrue(Set.of(RoleName.USER),pageable);
+        return users
+                .stream()
+                .map(user -> UserResponse
+                    .builder()
+                    .id(user.getId())
+                    .name(user.getUserDetails().getName())
+                    .surname(user.getUserDetails().getSurname())
+                    .phone(user.getUserDetails().getPhone())
+                    .address(user.getUserDetails().getAddress())
+                    .roles(user.getRoles().stream().map(Roles::getName).toList())
+                    .build()
+                ).toList();
+    }
+
+    public UserResponse update(UserRequestUpdate request) {
+
+        JwtAuthenticationToken jwt = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        UUID uuid = UUID.fromString(jwt.getToken().getClaimAsString("userId"));
+
+        User user = userRepository
+                .findByIdAndEnabledIsTrue(uuid)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (request.email() != null)    user.setEmail(request.email());
+        if (request.username() != null) user.setUsername(request.username());
+        if (request.name() != null)     user.getUserDetails().setName(request.name());
+        if (request.surname() != null)  user.getUserDetails().setSurname(request.surname());
+        if (request.phone() != null)    user.getUserDetails().setPhone(request.phone());
+        if (request.address() != null)  user.getUserDetails().setAddress(request.address());
+
+        return UserResponse
+                .builder()
+                .id(user.getId())
+                .name(user.getUserDetails().getName())
+                .surname(user.getUserDetails().getSurname())
+                .phone(user.getUserDetails().getPhone())
+                .address(user.getUserDetails().getAddress())
+                .roles(user.getRoles().stream().map(Roles::getName).toList())
+                .build();
+    }
+
+    public void changePassword(ChangePassword changePassword){
+        JwtAuthenticationToken jwt =(JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        String id = jwt.getToken().getClaimAsString("userId");
+        UUID userId = UUID.fromString(id);
+        User user = userRepository.findByIdAndEnabledIsTrue(userId).orElseThrow(()->new RuntimeException("User not found"));
+        if(!passwordEncoder.matches(changePassword.oldPassword(),user.getPassword())){
+            throw new RuntimeException("Old password is incorrect");
+        }
+        String newPasswordHash = passwordEncoder.encode(changePassword.newPassword());
+        user.setPassword(newPasswordHash);
+        userRepository.save(user);
+    }
+
 
     public RegisterResponse saveUser(RegisterRequest registerRequest){
 

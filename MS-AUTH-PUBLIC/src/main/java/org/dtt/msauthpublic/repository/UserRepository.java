@@ -1,14 +1,14 @@
 package org.dtt.msauthpublic.repository;
 
+import org.dtt.msauthpublic.model.RoleName;
 import org.dtt.msauthpublic.model.User;
 import org.dtt.msauthpublic.repository.projections.AuthorityProjection;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, UUID> {
@@ -16,6 +16,8 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     Optional<User> findByUsername(String username);
 
     Optional<User> findByIdAndEnabledIsTrue(UUID id);
+
+    List<User> findAllByRoles_NameInAndEnabledTrue(Set<RoleName> roles, Pageable pageable);
 
     @Query(value = """
     SELECT DISTINCT authority, username
