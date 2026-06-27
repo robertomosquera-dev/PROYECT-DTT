@@ -1,8 +1,6 @@
 package org.dtt.msorder.service;
 
 import lombok.RequiredArgsConstructor;
-import org.dtt.msorder.dto.Request.OrderProductsRequest;
-import org.dtt.msorder.dto.Request.OrderRequest;
 import org.dtt.msorder.dto.Response.*;
 import org.dtt.msorder.mapper.OrderMapping;
 import org.dtt.msorder.model.OrderItem;
@@ -14,7 +12,7 @@ import org.dtt.msorder.service.WebClientService.UserService;
 import org.dtt.msorder.service.sagaService.SagaContext;
 import org.dtt.msorder.service.sagaService.SagaStepsService;
 import org.dtt.msorder.service.sagaService.Steps.PaymentStep.*;
-import org.dtt.msorder.utils.JwtUtils;
+import org.dtt.msorder.dto.Request.OrderRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -36,35 +34,30 @@ public class OrderOrchestratorService {
     private final PendingOrderStep pendingOrderStep;
 
     private final OrderMapping orderMapping;
-
     private final LogicService logicService;
     private final UserService userService;
-
     private final OrderService orderService;
 
-
-    public OrderResponse createOrder(OrderRequest orderRequest){
-
-        if(orderRequest == null)
+    public OrderResponse createOrder(OrderRequest orderRequest) {
+        if (orderRequest == null)
             throw new IllegalArgumentException("Order request is null");
 
         SagaContext context = new SagaContext();
         context.setOrderRequest(orderRequest);
 
         UserResponse user = userService.getUser();
-
         context.setUserId(user.userId());
         context.setUserResponse(user);
 
         return sagaStepsService.runSteps(
                 List.of(
-                    buildPayerStep,
-                    createOrderStep,
-                    creationReservationStep,
-                    saveItemStep,
-                    calculateStep,
-                    createPaymentStep,
-                    pendingOrderStep
+                        buildPayerStep,
+                        createOrderStep,
+                        creationReservationStep,
+                        saveItemStep,
+                        calculateStep,
+                        createPaymentStep,
+                        pendingOrderStep
                 ),
                 context
         );
@@ -83,30 +76,18 @@ public class OrderOrchestratorService {
 
         order = orderService.updateOrder(order);
 
-        Integer stockPerItem = getStockPerItem(order);
-
-        return orderMapping.toDetailsResponse(order,stockPerItem);
+        return orderMapping.toDetailsResponse(order, getStockPerItem(order));
     }
 
-
-    private static final Map<OrderStatus, Set<OrderStatus>> VALID_TRANSITIONS = Map.of(
-            OrderStatus.PENDING, Set.of(OrderStatus.WAITING_PAYMENT, OrderStatus.CANCELLED),
-            OrderStatus.WAITING_PAYMENT, Set.of(OrderStatus.COMPLETED, OrderStatus.CANCELLED),
-            OrderStatus.COMPLETED, Set.of(),
-            OrderStatus.CANCELLED, Set.of()
-    );
-
     private void validateTransition(OrderStatus currentStatus, OrderStatus newStatus) {
-        Set<OrderStatus> allowed = VALID_TRANSITIONS.getOrDefault(currentStatus, Set.of());
-
-        if (!allowed.contains(newStatus)) {
+        if (!currentStatus.canTransitionTo(newStatus)) {
             throw new IllegalStateException(
                     "Invalid transition from " + currentStatus + " to " + newStatus
             );
         }
     }
 
-    private void acceptOrder(PurchaseOrder order){
+    private void acceptOrder(PurchaseOrder order) {
         if (order.getReservationId() != null) {
             logicService.confirmReservation(order.getReservationId());
         }
@@ -114,7 +95,7 @@ public class OrderOrchestratorService {
         order.setPaymentStatus(PaymentStatus.APPROVED);
     }
 
-    private void cancelOrder(PurchaseOrder order){
+    private void cancelOrder(PurchaseOrder order) {
         if (order.getReservationId() != null) {
             logicService.cancelReservation(order.getReservationId());
         }
@@ -127,9 +108,7 @@ public class OrderOrchestratorService {
         order.setPaymentStatus(PaymentStatus.PENDING);
     }
 
-    //Cambio OrderDTO
     public OrderDTO findOrderById(UUID orderId) {
-
         UserResponse user = userService.getUser();
 
         PurchaseOrder order = orderService.findByIdAndUser(orderId, user.userId());
@@ -156,16 +135,26 @@ public class OrderOrchestratorService {
                 .build();
     }
 
-    private ItemResponse buildItemResponse(
-            ItemOrderResponse productDetail,
-            Map<UUID,OrderItem> itemsMap
-    ) {
+    public OrderDetailsResponse findOrderById(UUID orderId, UUID userId) {
+        if (orderId == null || userId == null)
+            throw new IllegalArgumentException("Order id or user id is null");
 
+        PurchaseOrder order = orderService.findByIdAndUser(orderId, userId);
+        return orderMapping.toDetailsResponse(order, getStockPerItem(order));
+    }
+
+    public List<OrderDetailsResponse> findList() {
+        return orderService.listOrder()
+                .stream()
+                .map(order -> orderMapping.toDetailsResponse(order, getStockPerItem(order)))
+                .toList();
+    }
+
+    private ItemResponse buildItemResponse(ItemOrderResponse productDetail, Map<UUID, OrderItem> itemsMap) {
         OrderItem item = itemsMap.get(productDetail.id());
 
         if (item == null)
             throw new IllegalStateException("Producto no encontrado: " + productDetail.id());
-
 
         return ItemResponse.builder()
                 .itemId(item.getId())
@@ -179,35 +168,10 @@ public class OrderOrchestratorService {
                 .build();
     }
 
-    private Integer getStockPerItem(PurchaseOrder order){
-        List<OrderItem> items = order.getItems();
-        return items
+    private Integer getStockPerItem(PurchaseOrder order) {
+        return order.getItems()
                 .stream()
                 .map(OrderItem::getQuantity)
                 .reduce(0, Integer::sum);
-    }
-
-    //Cambio OrderDTO
-    public OrderDetailsResponse findOrderById(UUID orderId, UUID userId){
-        if (orderId == null || userId == null){
-            throw new IllegalArgumentException("Order id or user id is null");
-        }
-        PurchaseOrder order = orderService.findByIdAndUser(orderId, userId);
-        Integer stockPerItem = getStockPerItem(order);
-        return orderMapping.toDetailsResponse(order,stockPerItem);
-    }
-
-    public List<OrderDetailsResponse> findList() {
-        return orderService.listOrder()
-                .stream()
-                .map(this::mapToDetails)
-                .toList();
-    }
-
-    private OrderDetailsResponse mapToDetails(PurchaseOrder order) {
-
-        Integer totalPerItem = getStockPerItem(order);
-
-        return orderMapping.toDetailsResponse(order, totalPerItem);
     }
 }

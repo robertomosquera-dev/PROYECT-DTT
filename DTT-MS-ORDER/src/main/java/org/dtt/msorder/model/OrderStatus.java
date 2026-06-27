@@ -1,9 +1,29 @@
 package org.dtt.msorder.model;
 
+import java.util.Set;
+
 public enum OrderStatus {
-    PENDING,           // recién creada
-    WAITING_PAYMENT,   // esperando que el cliente pague
-    COMPLETED,         // todo ok (pagado + confirmado)
-    CANCELLED,         // cancelada
-    FAILED             // falló algo en la saga
+    PENDING {
+        @Override
+        public Set<OrderStatus> nextStates() {
+            return Set.of(WAITING_PAYMENT, CANCELLED, FAILED);
+        }
+    },
+    WAITING_PAYMENT {
+        @Override
+        public Set<OrderStatus> nextStates() {
+            return Set.of(COMPLETED, CANCELLED, FAILED);
+        }
+    },
+    COMPLETED,
+    CANCELLED,
+    FAILED;
+
+    public Set<OrderStatus> nextStates() {
+        return Set.of();
+    }
+
+    public boolean canTransitionTo(OrderStatus nextState) {
+        return nextStates().contains(nextState);
+    }
 }
