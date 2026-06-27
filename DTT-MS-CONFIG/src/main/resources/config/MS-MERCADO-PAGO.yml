@@ -1,5 +1,9 @@
 spring:
   application:
     name: MS-MERCADO-PAGO
+  cloud:
+    openfeign:
+      okhttp:
+        enabled: true
 server:
   port: 7080

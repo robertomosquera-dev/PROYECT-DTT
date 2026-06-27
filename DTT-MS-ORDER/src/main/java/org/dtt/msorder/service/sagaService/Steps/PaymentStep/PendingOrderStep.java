@@ -26,7 +26,7 @@ public class PendingOrderStep implements IStep {
         order.setTotal(context.getTotal());
         order.setIgv(context.getIgv());
 
-        order.setMpPaymentId(context.getPaymentResponse().mpPreferenceId());
+        order.setMpPreferenceId(context.getPaymentResponse().mpPreferenceId());
         order.setInitPoint(context.getPaymentResponse().initPoint());
         order.setPaymentStatus(context.getOrder().getPaymentStatus());
 

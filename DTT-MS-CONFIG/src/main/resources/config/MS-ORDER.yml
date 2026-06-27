@@ -17,6 +17,9 @@ spring:
       cache:
         ttl: 5s
         capacity: 256
+    openfeign:
+      okhttp:
+        enabled: true
   datasource:
     hikari:
       maximum-pool-size: 20

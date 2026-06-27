@@ -52,12 +52,14 @@ public class OrderController {
     public OrderDetailsResponse processOrder(
             @PathVariable UUID orderId,
             @PathVariable UUID userId,
-            @RequestParam OrderStatus newStatus
+            @RequestParam OrderStatus newStatus,
+            @RequestParam(required = false) String paymentId
     ) {
         return orderOrchestratorService.processOrder(
                 orderId,
                 userId,
-                newStatus
+                newStatus,
+                paymentId
         );
     }
 

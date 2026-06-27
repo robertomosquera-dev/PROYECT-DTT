@@ -61,13 +61,13 @@ public class OrderOrchestratorService {
         );
     }
 
-    public OrderDetailsResponse processOrder(UUID orderId, UUID userId, OrderStatus newStatus) {
+    public OrderDetailsResponse processOrder(UUID orderId, UUID userId, OrderStatus newStatus,String paymentId) {
         PurchaseOrder order = orderService.findByIdAndUser(orderId, userId);
 
         validateTransition(order.getOrderStatus(), newStatus);
 
         switch (newStatus) {
-            case COMPLETED -> acceptOrder(order);
+            case COMPLETED -> acceptOrder(order,paymentId);
             case CANCELLED -> cancelOrder(order);
         }
 
@@ -83,12 +83,13 @@ public class OrderOrchestratorService {
         }
     }
 
-    private void acceptOrder(PurchaseOrder order) {
+    private void acceptOrder(PurchaseOrder order,String paymentId) {
         if (order.getReservationId() != null) {
             logicService.confirmReservation(order.getReservationId());
         }
         order.setOrderStatus(OrderStatus.COMPLETED);
         order.setPaymentStatus(PaymentStatus.APPROVED);
+        order.setMpPaymentId(paymentId);
     }
 
     private void cancelOrder(PurchaseOrder order) {

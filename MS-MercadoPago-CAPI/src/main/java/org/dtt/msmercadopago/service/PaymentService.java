@@ -10,6 +10,7 @@ import com.mercadopago.resources.preference.Preference;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dtt.msmercadopago.DTO.*;
+import org.dtt.msmercadopago.client.OrderClient;
 import org.dtt.msmercadopago.config.MercadoPagoCredentials;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
@@ -22,6 +23,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 
@@ -49,6 +51,8 @@ public class PaymentService {
     private String UrlNotification;
 
     private final MerchantOrderClient merchantOrderClient;
+
+    private final OrderClient orderClient;
 
 
     @PostConstruct
@@ -128,45 +132,21 @@ public class PaymentService {
         }
 
     }
-
-    public WebhookOrderData processWebhook(Long merchantOrderId)
+    public void processOrderFromWebhook(String merchantOrderId, OrderStatus status)
             throws MPException, MPApiException {
-
-        MerchantOrder order = merchantOrderClient.get(merchantOrderId);
-
+        MerchantOrder order = merchantOrderClient.get(Long.parseLong(merchantOrderId));
         Preference preference = client.get(order.getPreferenceId());
 
-        Map<String, String> metadata = preference.getMetadata()
-                .entrySet()
-                .stream()
-                .filter(e -> e.getValue() != null)
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        e -> e.getValue().toString()
-                ));
+        UUID orderId = UUID.fromString(order.getExternalReference());
+        UUID userId = UUID.fromString(preference.getMetadata().get("user_id").toString());
 
-        List<PaymentData> payments = order.getPayments().stream()
-                .map(p -> new PaymentData(
-                        p.getStatus(),
-                        p.getTransactionAmount()
-                ))
-                .toList();
+        String paymentId = order.getPayments().isEmpty()
+                ? null
+                : order.getPayments().get(0).getId().toString();
 
-        BigDecimal totalAmount = order.getTotalAmount();
-
-        log.info("Pagos encontrados: {}", payments);
-        log.info("Total orden: {}", totalAmount);
-
-        return new WebhookOrderData(
-                order.getExternalReference(),
-                order.getOrderStatus(),
-                metadata,
-                payments,
-                totalAmount
-        );
+        orderClient.processOrder(orderId, userId, status, paymentId);
+        log.info("📦 orderId={}, userId={}, status={}, paymentId={}", orderId, userId, status, paymentId);
     }
-
-
     /**
      * Es un mapeo de una lista con validacion nada mas.
      * @comment Usar la dependecia validation para verificar la lista de items, queda mas limpio el metodo
