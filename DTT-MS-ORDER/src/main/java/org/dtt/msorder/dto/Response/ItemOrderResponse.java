@@ -8,8 +8,8 @@ import java.util.UUID;
 @Builder
 public record ItemOrderResponse(
         UUID id,
-        String nombre,
-        ProductType tipo,
-        String imagenUrl
+        String name,
+        ProductType type,
+        String imageUrl
 ) {
 }

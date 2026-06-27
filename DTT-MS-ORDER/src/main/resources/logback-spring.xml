@@ -11,7 +11,6 @@
     </appender>
 
     <logger name="org.dtt.msorder" level="INFO"/>
-    <logger name="org.dtt.msorder.client.WebClientMP" level="DEBUG"/>
     <logger name="org.springframework" level="WARN"/>
     <logger name="org.hibernate" level="ERROR" />
 

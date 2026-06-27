@@ -22,7 +22,6 @@ import java.util.UUID;
 public class CreationReservationStep implements IStep {
 
     private final LogicService logicService;
-    private final JwtUtils jwtUtils;
 
     @TrackExecutionTime
     @Override
@@ -45,7 +44,7 @@ public class CreationReservationStep implements IStep {
 
         try {
             ReservationResponse reservationResponse =
-                    logicService.productReservation(reservationRequest,jwtUtils.getToken().getTokenValue());
+                    logicService.productReservation(reservationRequest);
             context.setReservationResponse(reservationResponse);
         } catch (RuntimeException e) {
             throw new ExepcionCatalog(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -65,7 +64,7 @@ public class CreationReservationStep implements IStep {
             return;
         }
 
-        logicService.cancelReservation(reservationId,jwtUtils.getToken().getTokenValue());
+        logicService.cancelReservation(reservationId);
     }
 
     private void validationContextForReservation(SagaContext context){

@@ -1,4 +1,4 @@
-package org.dtt.mscatalog.infrastructure.utils;
+package org.dtt.msorder.utils;
 
 public record ConsumerResponse<T> (
         Boolean isError,

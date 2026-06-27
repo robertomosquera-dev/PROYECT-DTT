@@ -8,14 +8,15 @@ import java.util.UUID;
 
 @Builder
 public record ItemResponse(
-        UUID id,
+        UUID itemId,
+        UUID productId,
         ProductType type,
-        String title,
+        String name,
 
         Integer quantity,
         BigDecimal unitPrice,
         BigDecimal subtotal,
 
-        String pictureUrl
+        String imageUrl
 ) {
 }

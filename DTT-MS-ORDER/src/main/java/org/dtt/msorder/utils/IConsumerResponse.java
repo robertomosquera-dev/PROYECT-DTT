@@ -1,6 +1,6 @@
-package org.dtt.mscatalog.infrastructure.utils;
+package org.dtt.msorder.utils;
 
-public interface IConsumerResponse <T>{
+public interface IConsumerResponse<T>{
     Boolean isError();
     Integer code();
     String message();

@@ -25,14 +25,13 @@ public class ItemService {
         BigDecimal subTotal = itemRequest
                 .unitPrice()
                 .multiply(BigDecimal.valueOf(itemRequest.quantity()));
-        OrderItem item = OrderItem.builder()
+        return OrderItem.builder()
                 .productId(itemRequest.productId())
                 .quantity(itemRequest.quantity())
                 .unitPrice(itemRequest.unitPrice())
                 .subtotal(subTotal)
                 .order(order)
                 .build();
-        return item;
     }
 
     private static List<OrderItem> ItemMapListOptime(PurchaseOrder order,List<ItemCatalogResponse>itemRequests){

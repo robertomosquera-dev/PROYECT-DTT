@@ -42,7 +42,6 @@ public class OrderOrchestratorService {
 
     private final OrderService orderService;
 
-    private final JwtUtils jwtUtils;
 
     public OrderResponse createOrder(OrderRequest orderRequest){
 
@@ -109,7 +108,7 @@ public class OrderOrchestratorService {
 
     private void acceptOrder(PurchaseOrder order){
         if (order.getReservationId() != null) {
-            logicService.confirmReservation(order.getReservationId(),jwtUtils.getToken().getTokenValue());
+            logicService.confirmReservation(order.getReservationId());
         }
         order.setOrderStatus(OrderStatus.COMPLETED);
         order.setPaymentStatus(PaymentStatus.APPROVED);
@@ -117,7 +116,7 @@ public class OrderOrchestratorService {
 
     private void cancelOrder(PurchaseOrder order){
         if (order.getReservationId() != null) {
-            logicService.cancelReservation(order.getReservationId(),jwtUtils.getToken().getTokenValue());
+            logicService.cancelReservation(order.getReservationId());
         }
         order.setOrderStatus(OrderStatus.CANCELLED);
         order.setPaymentStatus(PaymentStatus.CANCELLED);
@@ -133,67 +132,50 @@ public class OrderOrchestratorService {
 
         UserResponse user = userService.getUser();
 
-        PurchaseOrder purchaseOrder = orderService.findByIdAndUser(
-                orderId,
-                user.userId()
-        );
+        PurchaseOrder order = orderService.findByIdAndUser(orderId, user.userId());
 
-        List<OrderItem> orderItems = purchaseOrder.getItems();
+        Map<UUID, OrderItem> itemsMap = order.getItems().stream()
+                .collect(Collectors.toMap(OrderItem::getProductId, Function.identity()));
 
-        List<UUID> productIds = orderItems.stream()
-                .map(OrderItem::getProductId)
-                .toList();
-
-        Map<UUID, List<UUID>> orderProducts = Map.of(
-                purchaseOrder.getId(),
-                productIds
-        );
-
-        Map<UUID, ItemOrderResponse> itemsMap = logicService
-                .getItemsFromReservation(orderProducts,jwtUtils.getToken().getTokenValue())
+        List<ItemResponse> itemsResponse = logicService.getItemsFromReservation(order.getId())
                 .stream()
-                .collect(Collectors.toMap(
-                        ItemOrderResponse::id,
-                        Function.identity()
-                ));
-
-        List<ItemResponse> itemsResponse = orderItems.stream()
-                .map(item -> buildItemResponse(item, itemsMap))
+                .map(product -> buildItemResponse(product, itemsMap))
                 .toList();
 
         return OrderDTO.builder()
-                .orderId(purchaseOrder.getId())
-                .mpPreferenceId(purchaseOrder.getMpPreferenceId())
-                .initPoint(purchaseOrder.getInitPoint())
+                .orderId(order.getId())
+                .mpPreferenceId(order.getMpPreferenceId())
+                .initPoint(order.getInitPoint())
                 .payerName(user.firstName())
                 .payerEmail(user.email())
-                .totalItems(getStockPerItem(purchaseOrder))
-                .totalAmount(purchaseOrder.getTotal())
-                .orderStatus(purchaseOrder.getOrderStatus())
-                .paymentStatus(purchaseOrder.getPaymentStatus())
+                .totalItems(getStockPerItem(order))
+                .totalAmount(order.getTotal())
+                .orderStatus(order.getOrderStatus())
+                .paymentStatus(order.getPaymentStatus())
                 .items(itemsResponse)
                 .build();
     }
 
     private ItemResponse buildItemResponse(
-            OrderItem item,
-            Map<UUID, ItemOrderResponse> itemsMap
+            ItemOrderResponse productDetail,
+            Map<UUID,OrderItem> itemsMap
     ) {
 
-        ItemOrderResponse product = itemsMap.get(item.getProductId());
+        OrderItem item = itemsMap.get(productDetail.id());
 
-        if (product == null)
-            throw new IllegalStateException("Producto no encontrado: " + item.getProductId());
+        if (item == null)
+            throw new IllegalStateException("Producto no encontrado: " + productDetail.id());
 
 
         return ItemResponse.builder()
-                .id(product.id())
-                .type(product.tipo())
-                .title(product.nombre())
+                .itemId(item.getId())
+                .productId(productDetail.id())
+                .type(productDetail.type())
+                .name(productDetail.name())
                 .quantity(item.getQuantity())
                 .unitPrice(item.getUnitPrice())
                 .subtotal(item.getSubtotal())
-                .pictureUrl(product.imagenUrl())
+                .imageUrl(productDetail.imageUrl())
                 .build();
     }
 
