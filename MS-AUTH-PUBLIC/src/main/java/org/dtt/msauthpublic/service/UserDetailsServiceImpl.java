@@ -44,6 +44,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 .findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
+        if(!userBd.isVerified()){
+            throw new RuntimeException("User not verified");
+        }
+
         Collection<SimpleGrantedAuthority> authorities = userRepository
                 .findAuthorities(username)
                 .stream()

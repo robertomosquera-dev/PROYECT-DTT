@@ -3,8 +3,10 @@ package org.dtt.msauthpublic.model;
 import com.github.f4b6a3.uuid.UuidCreator;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SQLRestriction;
 
+import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
 
@@ -27,6 +29,15 @@ public class User {
     private String password;
     @Embedded
     private UserDetails userDetails;
+
+    private boolean verified;
+    private String verificationCode;
+    private Instant verificationCodeIssuedAt;
+    private Instant verificationCodeExpiration;
+
+    @CreationTimestamp
+    private Instant createdAt;
+
     private boolean enabled;
     private boolean accountNonExpired;
     private boolean credentialsNonExpired;
@@ -40,6 +51,7 @@ public class User {
     private void init(){
         if (this.id == null) this.id = UuidCreator.getTimeOrderedEpoch();
         this.enabled = true;
+        this.verified = false;
         this.accountNonExpired = true;
         this.credentialsNonExpired = true;
         this.accountNonLocked = true;

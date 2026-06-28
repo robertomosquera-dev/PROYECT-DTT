@@ -5,10 +5,6 @@ import jakarta.validation.constraints.*;
 
 public record UserRequestUpdate(
 
-        @Email
-        @Schema(description = "User email address", example = "roberto@example.com")
-        String email,
-
         @Size(min = 4, max = 20)
         @Schema(description = "Unique username", example = "robmosquera")
         String username,

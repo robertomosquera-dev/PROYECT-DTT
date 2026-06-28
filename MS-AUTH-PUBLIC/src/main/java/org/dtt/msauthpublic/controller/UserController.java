@@ -7,9 +7,11 @@ import lombok.RequiredArgsConstructor;
 import org.dtt.msauthpublic.dto.ChangePassword;
 import org.dtt.msauthpublic.dto.UserRequestUpdate;
 import org.dtt.msauthpublic.dto.UserResponse;
+import org.dtt.msauthpublic.dto.VerifyRequest;
 import org.dtt.msauthpublic.service.UserService;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,18 +25,41 @@ public class UserController {
 
     private final UserService userService;
 
+    @PreAuthorize("hasAnyRole('ADMIN','SUPER_ADMIN')")
     @Operation(summary = "Get user by id", description = "Returns user information by identifier.")
     @GetMapping("/{id}")
     public UserResponse getUserById(@PathVariable UUID id) {
         return userService.getUserById(id);
     }
 
-    @Operation(summary = "Get all users", description = "Returns paginated list of users.")
+    @PreAuthorize("hasAnyRole('ADMIN','SUPER_ADMIN')")
     @GetMapping
-    public List<UserResponse> findAllUsers(Pageable pageable) {
-        return userService.FindAllUsers(pageable);
+    public List<UserResponse> findAllUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction
+    ) {
+        if (sortBy == null || sortBy.isBlank()) sortBy = "id";
+        Sort sort = Sort.by(Sort.Direction.fromString(direction), sortBy);
+        return userService.FindAllUsers(page, size, sort);
     }
 
+    @Operation(summary = "Verify user", description = "Verifies user account with code sent to email.")
+    @PostMapping("/verify")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void verifyUser(@RequestBody @Valid VerifyRequest request) {
+        userService.verifyUser(request);
+    }
+
+    @Operation(summary = "Resend verification code", description = "Resends verification code to email.")
+    @PostMapping("/resend-code")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void resendCode(@RequestParam String email) {
+        userService.resendCode(email);
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN','SUPER_ADMIN','USER')")
     @Operation(summary = "Update user", description = "Partially updates authenticated user info.")
     @PatchMapping
     public UserResponse update(@RequestBody @Valid UserRequestUpdate request) {
@@ -42,6 +67,7 @@ public class UserController {
     }
 
     @Operation(summary = "Change password", description = "Changes authenticated user password.")
+    @PreAuthorize("hasAnyRole('ADMIN','SUPER_ADMIN','USER')")
     @PatchMapping("/change-password")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void changePassword(@RequestBody @Valid ChangePassword changePassword) {
@@ -51,6 +77,7 @@ public class UserController {
     @Operation(summary = "Delete user", description = "Disables a user by id.")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasAnyRole('ADMIN','SUPER_ADMIN')")
     public void deleteUser(@PathVariable UUID id) {
         userService.deleteUser(id);
     }

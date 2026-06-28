@@ -53,6 +53,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/auth/**",
                                 "/rol/**",
+                                "/users/**",
                                 "/.well-known/jwks.json",
                                 "/service/token",
                                 "/swagger-ui.html",

@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.*;
 
 @Repository
@@ -17,7 +18,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     Optional<User> findByIdAndEnabledIsTrue(UUID id);
 
-    List<User> findAllByRoles_NameInAndEnabledTrue(Set<RoleName> roles, Pageable pageable);
+    List<User> findAllByRoles_NameInAndEnabledTrueAndVerifiedTrue(Set<RoleName> roles, Pageable pageable);
 
     @Query(value = """
     SELECT DISTINCT authority, username
@@ -42,4 +43,8 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     WHERE username = :username
     """, nativeQuery = true)
     List<AuthorityProjection> findAuthorities(String username);
+
+    Optional<User> findByEmail(String email);
+
+    void deleteAllByVerifiedFalseAndCreatedAtBefore(Instant createdAtBefore);
 }
