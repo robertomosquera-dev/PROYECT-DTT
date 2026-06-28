@@ -1,0 +1,73 @@
+{
+  "name": "order-creation-notification",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "/order-creation-notification",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -240,
+        -48
+      ],
+      "id": "d62c4d32-d526-4de2-b698-bd6c20221823",
+      "name": "Webhook",
+      "webhookId": "104c150e-3bde-4a59-b20d-4bc801a31f0a"
+    },
+    {
+      "parameters": {
+        "from": "TiendaDonLlantas@rbcode.xyz",
+        "to": "={{ $json.body.email }}",
+        "subject": "=Pedido #{{ $json.body.orderId }} creado ",
+        "html": "=<div style=\"background:#f4f4f4;padding:2rem;font-family:Arial,sans-serif;\">\n  <div style=\"background:#ffffff;border-radius:8px;max-width:560px;margin:0 auto;overflow:hidden;border:1px solid #e5e5e5;\">\n    \n    <div style=\"background:#0f172a;padding:24px 32px;\">\n      <span style=\"color:#ffffff;font-size:20px;font-weight:700;\">rbcode.xyz</span>\n    </div>\n\n    <div style=\"padding:32px;\">\n      <p style=\"margin:0 0 4px;font-size:22px;font-weight:700;color:#0f172a;\">¡Pedido creado!</p>\n      <p style=\"margin:0 0 24px;font-size:14px;color:#64748b;line-height:1.6;\">\n        Tu pedido ha sido registrado exitosamente. Completa el pago para procesarlo.\n      </p>\n\n      <div style=\"background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px;margin-bottom:24px;\">\n        <p style=\"margin:0 0 4px;font-size:12px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;\">Número de orden</p>\n        <p style=\"margin:0;font-size:14px;font-weight:600;color:#0f172a;font-family:monospace;\">{{ $json.body.orderId }}</p>\n      </div>\n\n      <p style=\"margin:0 0 12px;font-size:14px;font-weight:600;color:#0f172a;\">Resumen del pedido</p>\n\n      {{ $json.body.items.map(item => `\n      <div style=\"display:flex;gap:12px;padding:12px 0;border-bottom:1px solid #f1f5f9;\">\n        <img src=\"${item.pictureUrl}\" alt=\"${item.title}\" width=\"64\" height=\"64\" style=\"border-radius:6px;object-fit:cover;border:1px solid #e2e8f0;\" />\n        <div style=\"flex:1;\">\n          <p style=\"margin:0 0 2px;font-size:14px;font-weight:600;color:#0f172a;\">${item.title}</p>\n          <p style=\"margin:0 0 2px;font-size:12px;color:#64748b;\">${item.description}</p>\n          <p style=\"margin:0;font-size:12px;color:#94a3b8;\">Cantidad: ${item.quantity} × ${item.currency} ${item.unitPrice.toFixed(2)}</p>\n        </div>\n        <div style=\"text-align:right;\">\n          <p style=\"margin:0;font-size:14px;font-weight:600;color:#0f172a;\">${item.currency} ${(item.quantity * item.unitPrice).toFixed(2)}</p>\n        </div>\n      </div>\n      `).join('') }}\n\n      <div style=\"display:flex;justify-content:space-between;padding:16px 0 24px;border-bottom:1px solid #e2e8f0;\">\n        <p style=\"margin:0;font-size:15px;font-weight:700;color:#0f172a;\">Total</p>\n        <p style=\"margin:0;font-size:15px;font-weight:700;color:#0f172a;\">\n          PEN {{ $json.body.items.reduce((acc, item) => acc + item.quantity * item.unitPrice, 0).toFixed(2) }}\n        </p>\n      </div>\n\n      <div style=\"text-align:center;margin-top:28px;\">\n        <a href=\"{{ $json.body.initPoint }}\" \n           style=\"display:inline-block;background:#009ee3;color:#ffffff;font-size:15px;font-weight:700;padding:14px 32px;border-radius:8px;text-decoration:none;\">\n          Pagar con Mercado Pago\n        </a>\n      </div>\n\n      <p style=\"margin:20px 0 0;font-size:12px;color:#94a3b8;text-align:center;\">\n        Si no realizaste este pedido, ignora este correo.\n      </p>\n    </div>\n\n    <div style=\"background:#f8fafc;padding:16px 32px;border-top:1px solid #e5e5e5;\">\n      <p style=\"margin:0;font-size:11px;color:#94a3b8;text-align:center;\">© 2025 rbcode.xyz · Todos los derechos reservados</p>\n    </div>\n\n  </div>\n</div>",
+        "additionalOptions": {}
+      },
+      "type": "n8n-nodes-resend.resend",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -48
+      ],
+      "id": "6a345edd-de9c-4fb8-8c4d-3c77cdf40261",
+      "name": "Send a new email",
+      "webhookId": "c3ea864f-128d-4c61-b986-64996febd900",
+      "credentials": {
+        "resendApi": {
+          "id": "YLwaydM1iziZw6XZ",
+          "name": "Resend account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Send a new email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "f7504564-3e7b-45c2-abcf-533ba91cb567",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4acdc73a6240efed03e86858e4c23a5655b38e3f8c0bcf1d3536b22b4c48a7bf"
+  },
+  "nodeGroups": [],
+  "id": "MBzbp7NcTkv7CLI7",
+  "tags": []
+}

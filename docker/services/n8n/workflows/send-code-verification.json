@@ -1,0 +1,73 @@
+{
+  "name": "send-code-verification",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "send-code-verification",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "fa1abcfa-6bb5-4c9e-ab3c-7f5e9b94568f",
+      "name": "Webhook",
+      "webhookId": "a75cc2a0-bfd5-4e5c-a50b-2e2e8f58c31a"
+    },
+    {
+      "parameters": {
+        "from": "TiendaDonLlantas@rbcode.xyz",
+        "to": "={{ $json.body.email }}",
+        "subject": "Código de verificación - Tienda DTT",
+        "html": "=<!-- {{ $json.body.name }}, {{ $json.body.code }} -->\n<div style=\"background:#f4f4f4;padding:2rem;font-family:Arial,sans-serif;\">\n  <div style=\"background:#ffffff;border-radius:8px;max-width:480px;margin:0 auto;overflow:hidden;border:1px solid #e5e5e5;\">\n    <div style=\"background:#0f172a;padding:24px 32px;\">\n      <span style=\"color:#ffffff;font-size:20px;font-weight:700;\">rbcode.xyz</span>\n    </div>\n    <div style=\"padding:32px;\">\n      <p style=\"margin:0 0 8px;font-size:22px;font-weight:700;color:#0f172a;\">Verifica tu cuenta</p>\n      <p style=\"margin:0 0 24px;font-size:14px;color:#64748b;line-height:1.6;\">\n        Hola <strong>{{ $json.body.name }}</strong>, usa el siguiente código para completar tu verificación. Expira en 10 minutos.\n      </p>\n      <div style=\"background:#f8fafc;border:1.5px dashed #cbd5e1;border-radius:8px;padding:24px;text-align:center;margin-bottom:24px;\">\n        <span style=\"font-size:36px;font-weight:800;letter-spacing:12px;color:#0f172a;font-family:monospace;\">{{ $json.body.code }}</span>\n      </div>\n      <p style=\"margin:0;font-size:12px;color:#94a3b8;text-align:center;\">Si no solicitaste esto, ignora este correo.</p>\n    </div>\n    <div style=\"background:#f8fafc;padding:16px 32px;border-top:1px solid #e5e5e5;\">\n      <p style=\"margin:0;font-size:11px;color:#94a3b8;text-align:center;\">© 2025 rbcode.xyz · Todos los derechos reservados</p>\n    </div>\n  </div>\n</div>",
+        "additionalOptions": {}
+      },
+      "type": "n8n-nodes-resend.resend",
+      "typeVersion": 1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "43ffb67f-05eb-49be-905d-f5aa2bd02f04",
+      "name": "Send a new email",
+      "webhookId": "93b91acb-ecf2-459f-b425-dc4b640665a1",
+      "credentials": {
+        "resendApi": {
+          "id": "YLwaydM1iziZw6XZ",
+          "name": "Resend account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Send a new email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "d16bb7ae-e827-4b81-a92c-ae3a57568628",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4acdc73a6240efed03e86858e4c23a5655b38e3f8c0bcf1d3536b22b4c48a7bf"
+  },
+  "nodeGroups": [],
+  "id": "yZstzDJ8BlcGV36B",
+  "tags": []
+}

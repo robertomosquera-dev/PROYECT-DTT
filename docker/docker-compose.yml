@@ -75,6 +75,16 @@ services:
       file: ./services/redis/docker-compose.yml
       service: redis
 
+  n8n:
+    extends:
+      file: ./services/n8n/docker-compose.yml
+      service: n8n
+    depends_on:
+      auth-public:
+        condition: service_started
+      order:
+        condition: service_started
+
 networks:
   dtt-network:
     name: dtt-network
@@ -82,3 +92,4 @@ networks:
 
 volumes:
   redis-data:
+  n8n_data:

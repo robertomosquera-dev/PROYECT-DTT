@@ -1,0 +1,16 @@
+services:
+  n8n:
+    image: docker.n8n.io/n8nio/n8n
+    container_name: dtt-n8n
+    restart: always
+    ports:
+      - "${N8N_PORT}:5678"
+    env_file:
+      - ../../.env
+    volumes:
+      - n8n_data:/home/node/.n8n
+    networks:
+      - dtt-network
+
+volumes:
+  n8n_data:
