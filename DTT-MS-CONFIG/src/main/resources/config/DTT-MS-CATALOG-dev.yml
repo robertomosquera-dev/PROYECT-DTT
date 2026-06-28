@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/catalog-bd
+    url: jdbc:postgresql://localhost:5432/catalog_db
     username: root
     password: 1134
   cache:

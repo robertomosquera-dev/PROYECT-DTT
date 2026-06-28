@@ -20,5 +20,12 @@ jwt:
   issuer: ms-auth
   refresh-expiration-time: ${REFRESH_EXPIRATION_TIME}
 
+api:
+  n8n: http://localhost:5678
+
 server:
   port: ${AUTH_PORT}
+
+security:
+  username: ${USERNAME}
+  password: ${PASSWORD}

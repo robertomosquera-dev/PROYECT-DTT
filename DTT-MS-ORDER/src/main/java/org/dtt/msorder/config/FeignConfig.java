@@ -16,9 +16,10 @@ public class FeignConfig {
         return (template -> {
             try {
                 Jwt jwt = jwtUtils.getToken();
+                System.out.println("JWT encontrado: " + jwt.getTokenValue().substring(0, 20) + "...");
                 template.header("Authorization", "Bearer " + jwt.getTokenValue());
             } catch (Exception e) {
-                // No se pudo obtener el token JWT
+                System.out.println("Error obteniendo JWT: " + e.getMessage());
             }
         });
     }

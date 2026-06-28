@@ -13,8 +13,8 @@ api:
   order: http://localhost:8060/
 auth:
   url: http://localhost:9095
-  service-name: MS-MERCADO-PAGO
-  api-key: ${AuthApiKey:297378c3-4cea-465e-b321-bd0221f987b0}
+  service-name: API-MERCADO-PAGO
+  api-key: ${AuthApiKey:03b973b2-bf65-41c1-9785-619e6b15dc6a}
 
 url:
   notification: https://keesha-velutinous-sufficiently.ngrok-free.dev/webhook-test

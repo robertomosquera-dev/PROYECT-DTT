@@ -29,7 +29,8 @@ public class SpringSecurityConfig {
                         .pathMatchers(
                                 "/auth/**",
                                 "/rol/**",
-                                "/roles/**"
+                                "/roles/**",
+                                "/users/**"
                         ).permitAll()
 
                         .pathMatchers(

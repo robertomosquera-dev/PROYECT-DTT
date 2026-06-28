@@ -36,7 +36,7 @@ public class CreateOrderStep implements IStep {
         String platform = context.getOrderRequest().platform();
         Currency currency = context.getOrderRequest().currency();
 
-        PurchaseOrder order = orderService.saveOrderByDefault(userId, platform, currency);
+        PurchaseOrder order = orderService.saveOrderByDefault(userId, platform, currency,context.getUserResponse().email());
 
         context.setOrder(order);
     }

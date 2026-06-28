@@ -2,7 +2,7 @@ spring:
   application:
     name: MS-AUTH-PUBLIC
   datasource:
-    url: jdbc:postgresql://localhost:5432/ms-auth
+    url: jdbc:postgresql://localhost:5432/auth_db
     username: root
     password: 1134
   jpa:
@@ -30,3 +30,10 @@ springdoc:
     operations-sorter: method
     tags-sorter: alpha
     display-request-duration: true
+
+security:
+  username: admin
+  password: admin123
+
+api:
+  n8n: http://localhost:5678

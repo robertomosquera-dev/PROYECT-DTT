@@ -62,6 +62,7 @@ public class PurchaseOrder {
     private Currency currency;
     private String platform;
     private UUID userId;
+    private String payerEmail;
 
 
     private UUID reservationId;

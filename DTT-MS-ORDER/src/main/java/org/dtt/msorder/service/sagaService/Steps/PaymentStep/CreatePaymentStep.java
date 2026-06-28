@@ -2,6 +2,8 @@ package org.dtt.msorder.service.sagaService.Steps.PaymentStep;
 
 import lombok.RequiredArgsConstructor;
 import org.dtt.msorder.aop.TrackExecutionTime;
+import org.dtt.msorder.client.N8nClient;
+import org.dtt.msorder.dto.Request.OrderNotificationRequest;
 import org.dtt.msorder.dto.Request.PaymentItemRequest;
 import org.dtt.msorder.dto.Request.PaymentOrderRequest;
 import org.dtt.msorder.dto.Response.PaymentResponse;
@@ -20,7 +22,7 @@ import java.util.List;
 public class CreatePaymentStep implements IStep {
 
     private final MpService mpService;
-
+    private final N8nClient n8nClient;
     @TrackExecutionTime
     @Override
     public void execute(SagaContext context) throws Exception {
@@ -51,6 +53,18 @@ public class CreatePaymentStep implements IStep {
                 .build();
 
         PaymentResponse paymentResponse = mpService.createPayment(orderRequest);
+
+        n8nClient.sendCreatedOrderNotification(
+                OrderNotificationRequest
+                        .builder()
+                        .mpPreferenceId(paymentResponse.mpPreferenceId())
+                        .initPoint(paymentResponse.initPoint())
+                        .orderId(paymentResponse.orderId())
+                        .status(paymentResponse.status())
+                        .email(context.getUserResponse().email())
+                        .items(items)
+                        .build()
+        );
 
         context.setPaymentResponse(paymentResponse);
     }

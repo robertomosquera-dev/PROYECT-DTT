@@ -1,6 +1,9 @@
 package org.dtt.msorder.service;
 
 import lombok.RequiredArgsConstructor;
+import org.dtt.msorder.client.N8nClient;
+import org.dtt.msorder.dto.Request.OrderPaymentConfirmationRequest;
+import org.dtt.msorder.dto.Request.PaymentConfirmationItemRequest;
 import org.dtt.msorder.dto.Response.*;
 import org.dtt.msorder.mapper.OrderMapping;
 import org.dtt.msorder.model.OrderItem;
@@ -35,6 +38,7 @@ public class OrderOrchestratorService {
     private final LogicService logicService;
     private final UserService userService;
     private final OrderService orderService;
+    private final N8nClient n8nClient;
 
     public OrderResponse createOrder(OrderRequest orderRequest) {
         if (orderRequest == null)
@@ -83,13 +87,34 @@ public class OrderOrchestratorService {
         }
     }
 
-    private void acceptOrder(PurchaseOrder order,String paymentId) {
+    private void acceptOrder(PurchaseOrder order, String paymentId) {
         if (order.getReservationId() != null) {
             logicService.confirmReservation(order.getReservationId());
         }
         order.setOrderStatus(OrderStatus.COMPLETED);
         order.setPaymentStatus(PaymentStatus.APPROVED);
         order.setMpPaymentId(paymentId);
+
+        n8nClient.sendPaymentConfirmationNotification(
+                OrderPaymentConfirmationRequest.builder()
+                        .orderId(order.getId())
+                        .mpPaymentId(paymentId)
+                        .status(OrderStatus.COMPLETED.name())
+                        .paymentStatus(PaymentStatus.APPROVED.name())
+                        .paidAt(order.getUpdatedAt())
+                        .email(order.getPayerEmail())
+                        .total(order.getTotal())
+                        .currency(order.getCurrency().name())
+                        .items(order.getItems().stream()
+                                .map(item -> PaymentConfirmationItemRequest.builder()
+                                        .quantity(item.getQuantity())
+                                        .unitPrice(item.getUnitPrice())
+                                        .subtotal(item.getSubtotal())
+                                        .build()
+                                ).toList()
+                        )
+                        .build()
+        );
     }
 
     private void cancelOrder(PurchaseOrder order) {
@@ -140,6 +165,22 @@ public class OrderOrchestratorService {
                 .stream()
                 .map(order -> orderMapping.toDetailsResponse(order, getStockPerItem(order)))
                 .toList();
+    }
+
+    public List<OrderDetailsResponse> findMyOrders() {
+        UserResponse user = userService.getUser();
+        return orderService.findAllByUserId(user.userId())
+                .stream()
+                .map(order -> orderMapping.toDetailsResponse(order, getStockPerItem(order)))
+                .toList();
+    }
+
+    public void cancelMyOrder(UUID orderId) {
+        UserResponse user = userService.getUser();
+        PurchaseOrder order = orderService.findByIdAndUser(orderId, user.userId());
+        validateTransition(order.getOrderStatus(), OrderStatus.CANCELLED);
+        cancelOrder(order);
+        orderService.updateOrder(order);
     }
 
     private ItemResponse buildItemResponse(ItemOrderResponse productDetail, Map<UUID, OrderItem> itemsMap) {

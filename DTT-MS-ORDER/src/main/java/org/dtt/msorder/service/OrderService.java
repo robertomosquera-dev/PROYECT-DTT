@@ -17,12 +17,13 @@ public class OrderService {
 
     private final PurchaseOrderRepository orderRepository;
 
-    public PurchaseOrder saveOrderByDefault(UUID userId, String platform, Currency currency) {
+    public PurchaseOrder saveOrderByDefault(UUID userId, String platform, Currency currency,String email) {
         PurchaseOrder order = PurchaseOrder
                 .builder()
                 .orderCode(OrderGenerateCode.generate(userId))
                 .orderStatus(OrderStatus.PENDING)
                 .paymentStatus(PaymentStatus.PENDING)
+                .payerEmail(email)
                 .userId(userId)
                 .platform(platform)
                 .currency(currency)
@@ -49,6 +50,10 @@ public class OrderService {
             order.setPaymentStatus(PaymentStatus.CANCELLED);
         }
         orderRepository.save(order);
+    }
+
+    public List<PurchaseOrder> findAllByUserId(UUID userId) {
+        return orderRepository.findAllByUserId(userId);
     }
 
     public List<PurchaseOrder> listOrder() {

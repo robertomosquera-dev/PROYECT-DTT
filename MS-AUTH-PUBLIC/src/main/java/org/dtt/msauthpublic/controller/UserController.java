@@ -20,19 +20,29 @@ import java.util.UUID;
 @RequestMapping("/users")
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "Users", description = "Endpoints for user management")
+@Tag(
+        name = "Users",
+        description = "Endpoints for user management. Roles: USER (update own profile, change password), ADMIN (view and manage users), SUPER_ADMIN (full access). Public: verify account, resend code."
+)
 public class UserController {
 
     private final UserService userService;
 
     @PreAuthorize("hasAnyRole('ADMIN','SUPER_ADMIN')")
-    @Operation(summary = "Get user by id", description = "Returns user information by identifier.")
+    @Operation(
+            summary = "Get user by id",
+            description = "Returns user information by identifier. Accessible by: ADMIN, SUPER_ADMIN."
+    )
     @GetMapping("/{id}")
     public UserResponse getUserById(@PathVariable UUID id) {
         return userService.getUserById(id);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN','SUPER_ADMIN')")
+    @Operation(
+            summary = "Get all users",
+            description = "Returns a paginated list of verified and active users with role USER. Accessible by: ADMIN, SUPER_ADMIN."
+    )
     @GetMapping
     public List<UserResponse> findAllUsers(
             @RequestParam(defaultValue = "0") int page,
@@ -45,14 +55,20 @@ public class UserController {
         return userService.FindAllUsers(page, size, sort);
     }
 
-    @Operation(summary = "Verify user", description = "Verifies user account with code sent to email.")
+    @Operation(
+            summary = "Verify account",
+            description = "Verifies a user account using the code sent to their email. Public endpoint — no authentication required."
+    )
     @PostMapping("/verify")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void verifyUser(@RequestBody @Valid VerifyRequest request) {
         userService.verifyUser(request);
     }
 
-    @Operation(summary = "Resend verification code", description = "Resends verification code to email.")
+    @Operation(
+            summary = "Resend verification code",
+            description = "Resends a new verification code to the given email. Public endpoint — no authentication required."
+    )
     @PostMapping("/resend-code")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void resendCode(@RequestParam String email) {
@@ -60,24 +76,33 @@ public class UserController {
     }
 
     @PreAuthorize("hasAnyRole('ADMIN','SUPER_ADMIN','USER')")
-    @Operation(summary = "Update user", description = "Partially updates authenticated user info.")
+    @Operation(
+            summary = "Update own profile",
+            description = "Partially updates the authenticated user's profile (username, name, surname, phone, address). Accessible by: USER, ADMIN, SUPER_ADMIN."
+    )
     @PatchMapping
     public UserResponse update(@RequestBody @Valid UserRequestUpdate request) {
         return userService.update(request);
     }
 
-    @Operation(summary = "Change password", description = "Changes authenticated user password.")
     @PreAuthorize("hasAnyRole('ADMIN','SUPER_ADMIN','USER')")
+    @Operation(
+            summary = "Change password",
+            description = "Changes the authenticated user's password. Requires current password for validation. Accessible by: USER, ADMIN, SUPER_ADMIN."
+    )
     @PatchMapping("/change-password")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void changePassword(@RequestBody @Valid ChangePassword changePassword) {
         userService.changePassword(changePassword);
     }
 
-    @Operation(summary = "Delete user", description = "Disables a user by id.")
+    @PreAuthorize("hasAnyRole('ADMIN','SUPER_ADMIN')")
+    @Operation(
+            summary = "Disable user",
+            description = "Soft deletes a user by setting enabled=false. The user must be verified. Accessible by: ADMIN, SUPER_ADMIN."
+    )
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasAnyRole('ADMIN','SUPER_ADMIN')")
     public void deleteUser(@PathVariable UUID id) {
         userService.deleteUser(id);
     }

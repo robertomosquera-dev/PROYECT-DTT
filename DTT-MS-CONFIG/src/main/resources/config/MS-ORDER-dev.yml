@@ -11,3 +11,4 @@ spring:
 api:
   catalog: http://localhost:8050
   mp: http://localhost:7080
+  n8n: http://localhost:5678

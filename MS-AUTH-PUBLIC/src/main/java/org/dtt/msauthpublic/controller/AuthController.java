@@ -20,7 +20,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Tag(
         name = "Authentication",
-        description = "Endpoints for user authentication and token management"
+        description = "Endpoints for authentication and token management. All endpoints are public — no authentication required."
 )
 public class AuthController {
 
@@ -28,35 +28,29 @@ public class AuthController {
 
     @Operation(
             summary = "Register user",
-            description = "Creates a new user account."
+            description = "Creates a new user account. Sends a verification code to the provided email. The account must be verified before login. Public endpoint."
     )
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/register")
-    public RegisterResponse userRegister(
-            @Valid @RequestBody RegisterRequest registerRequest
-    ) {
+    public RegisterResponse userRegister(@Valid @RequestBody RegisterRequest registerRequest) {
         return authService.registerUser(registerRequest);
     }
 
     @Operation(
-            summary = "Login user",
-            description = "Authenticates the user and returns JWT tokens."
+            summary = "Login",
+            description = "Authenticates a verified user and returns an access token and a refresh token. Public endpoint."
     )
     @PostMapping("/login")
-    public AuthResponse loginUser(
-            @Valid @RequestBody LoginRequest loginRequest
-    ) {
+    public AuthResponse loginUser(@Valid @RequestBody LoginRequest loginRequest) {
         return authService.loginUser(loginRequest);
     }
 
     @Operation(
             summary = "Refresh access token",
-            description = "Generates a new access token using a refresh token."
+            description = "Generates a new access token using a valid refresh token. Public endpoint."
     )
     @PostMapping("/refresh")
-    public AuthResponse refreshToken(
-            @RequestBody String refreshToken
-    ) {
+    public AuthResponse refreshToken(@RequestBody String refreshToken) {
         return authService.refreshToken(refreshToken);
     }
 }

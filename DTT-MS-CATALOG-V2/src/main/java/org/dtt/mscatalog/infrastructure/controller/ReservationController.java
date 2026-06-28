@@ -20,7 +20,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/reservation")
 @RequiredArgsConstructor
-@PreAuthorize("hasAnyRole('ADMIN','SUPER_ADMIN','SYSTEM')")
+@PreAuthorize("hasAnyRole('ADMIN','SUPER_ADMIN','SYSTEM','USER')")
 public class ReservationController {
 
     private final CreateReservationUseCase createReservationUseCase;

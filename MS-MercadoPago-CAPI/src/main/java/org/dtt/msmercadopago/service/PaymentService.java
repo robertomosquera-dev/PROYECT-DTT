@@ -144,8 +144,16 @@ public class PaymentService {
                 ? null
                 : order.getPayments().get(0).getId().toString();
 
-        orderClient.processOrder(orderId, userId, status, paymentId);
-        log.info("📦 orderId={}, userId={}, status={}, paymentId={}", orderId, userId, status, paymentId);
+        try {
+            orderClient.processOrder(orderId, userId, status, paymentId);
+            log.info("📦 orderId={}, userId={}, status={}, paymentId={}", orderId, userId, status, paymentId);
+        } catch (Exception e) {
+            if (e.getMessage() != null && e.getMessage().contains("Invalid transition")) {
+                log.warn("⚠️ Orden {} ya está en estado {}, ignorando webhook duplicado", orderId, status);
+            } else {
+                throw e;
+            }
+        }
     }
     /**
      * Es un mapeo de una lista con validacion nada mas.
