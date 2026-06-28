@@ -21,8 +21,7 @@ jwt:
   refresh-expiration-time: ${REFRESH_EXPIRATION_TIME}
 
 api:
-  n8n: http://localhost:5678
-
+  n8n: ${URL_API_N8N:http://dtt-n8n:5678}  
 server:
   port: ${AUTH_PORT}
 

@@ -26,4 +26,4 @@ spring:
 api:
   catalog: ${URL_API_CATALOG}
   mp: ${URL_API_MERCADO_PAGO}
-  n8n: ${URL_API_N8N}
+  n8n: ${URL_API_N8N:http://dtt-n8n:5678}  
